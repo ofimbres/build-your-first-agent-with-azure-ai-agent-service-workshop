@@ -13,5 +13,5 @@ string endpoint = configuration.GetConnectionString("AiAgentService") ?? throw n
 
 PersistentAgentsClient projectClient = new(endpoint, new DefaultAzureCredential());
 
-await using Lab lab = new Lab1(projectClient, apiDeploymentName);
-await lab.RunAsync();
+// await using Lab lab = new Lab1(projectClient, apiDeploymentName);
+// await lab.RunAsync();

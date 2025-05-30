@@ -91,7 +91,7 @@ public abstract class Lab(PersistentAgentsClient client, string modelName) : IAs
             {
                 Utils.LogGreen($"Saving thread with ID: {thread.Id} for agent ID: {agent.Id}. You can view this in AI Foundry at https://ai.azure.com.");
                 disposeAgent = false;
-                continue;
+                break;
             }
 
             _ = await Client.Messages.CreateMessageAsync(
