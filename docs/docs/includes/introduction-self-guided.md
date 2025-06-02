@@ -112,7 +112,7 @@ We have provided a bash script to automate the deployment of the resources requi
         ```python
         MODEL_DEPLOYMENT_NAME="gpt-4o"
         BING_CONNECTION_NAME="groundingwithbingsearch"
-        PROJECT_CONNECTION_STRING="<your_project_connection_string>"
+        PROJECT_ENDPOINT="<your_project_endpoint>"
         ```
     === "C#"
 
@@ -186,12 +186,13 @@ We have provided a bash script to automate the deployment of the resources requi
             ```bash
             CSHARP_PROJECT_PATH="src/csharp/workshop/AgentWorkshop.Client/AgentWorkshop.Client.csproj"
             ```
+
         3. Run the following command to set the [ASP.NET Core safe secret](https://learn.microsoft.com/aspnet/core/security/app-secrets){:target="_blank"} for the project endpoint:
 
-            !!! warning "Replace `<your_project_connection_string>` with the actual connection string"
+            !!! warning "Replace `<your_project_endpoint>` with the actual connection string"
 
             ```bash
-            dotnet user-secrets set "ConnectionStrings:AiAgentService" "<your_project_connection_string>" --project "$CSHARP_PROJECT_PATH"
+            dotnet user-secrets set "ConnectionStrings:AiAgentService" "<your_project_endpoint>" --project "$CSHARP_PROJECT_PATH"
             ```
 
         4. Run the following command to set the [ASP.NET Core safe secret](https://learn.microsoft.com/aspnet/core/security/app-secrets){:target="_blank"} for the model deployment name:
@@ -208,7 +209,7 @@ There are two workspaces in the workshop, one for Python and one for C#. The wor
 
     1. In Visual Studio Code, go to **File** > **Open Workspace from File**.
     2. Replace the default path with the following:
-    
+
         ```text
         /workspaces/build-your-first-agent-with-azure-ai-agent-service-workshop/.vscode/
         ```
@@ -237,7 +238,7 @@ There are two workspaces in the workshop, one for Python and one for C#. The wor
 
     1. In Visual Studio Code, go to **File** > **Open Workspace from File**.
     2. Replace the default path with the following:
-    
+
         ```text
         /workspaces/build-your-first-agent-with-azure-ai-agent-service-workshop/.vscode/
         ```
