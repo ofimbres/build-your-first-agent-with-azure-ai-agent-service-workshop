@@ -105,9 +105,9 @@ We have provided a bash script to automate the deployment of the resources requi
 
     === "Python"
 
-        The deploy script generates the **.env** file, which contains the project connection string, model deployment name, and Bing connection name.
+        The deploy script generates the **.env** file, which contains the project endpoint, model deployment name, and Bing connection name.
 
-        Your **.env** file should look similar to this but with your project connection string.
+        Your **.env** file should look similar to this but with your project endpoint.
 
         ```python
         MODEL_DEPLOYMENT_NAME="gpt-4o"
@@ -166,7 +166,7 @@ We have provided a bash script to automate the deployment of the resources requi
 
     ### Workshop Configuration
 
-    You'll need the project connection string to connect the agent app to the Azure AI Foundry project. You can find this string in the Azure AI Foundry portal in the Overview page for your Project `agent-workshop` (look in the Project details section).
+    You'll need the project endpoint to connect the agent app to the Azure AI Foundry project. You can find this string in the Azure AI Foundry portal in the Overview page for your Project `agent-workshop` (look in the Project details section).
 
     === "Python"
 
@@ -176,7 +176,7 @@ We have provided a bash script to automate the deployment of the resources requi
         cp src/python/workshop/.env.sample src/python/workshop/.env
         ```
 
-        Then edit the file `src/python/workshop/.env` to provide the Project Connection String.
+        Then edit the file `src/python/workshop/.env` to provide the Project endpoint.
 
     === "C#"
 
@@ -186,7 +186,7 @@ We have provided a bash script to automate the deployment of the resources requi
             ```bash
             CSHARP_PROJECT_PATH="src/csharp/workshop/AgentWorkshop.Client/AgentWorkshop.Client.csproj"
             ```
-        3. Run the following command to set the [ASP.NET Core safe secret](https://learn.microsoft.com/aspnet/core/security/app-secrets){:target="_blank"} for the project connection string:
+        3. Run the following command to set the [ASP.NET Core safe secret](https://learn.microsoft.com/aspnet/core/security/app-secrets){:target="_blank"} for the project endpoint:
 
             !!! warning "Replace `<your_project_connection_string>` with the actual connection string"
 
