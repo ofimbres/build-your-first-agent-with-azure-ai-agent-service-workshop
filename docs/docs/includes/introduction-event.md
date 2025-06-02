@@ -119,7 +119,7 @@ Next, we log in to Azure AI Foundry to retrieve the project endpoint, which the 
     ![Select project](../media/ai-foundry-project.png){:width="500"}
 
 6. Review the introduction guide and click **Close**.
-7. Locate the **Endpoints and keys** -> **Libraries** -> **Azure AI Foundry** section, click the **Copy** icon to copy the **Azure AI Foundry project endpoint**.
+7. From the **Overview** sidebar menu, locate the **Endpoints and keys** -> **Libraries** -> **Azure AI Foundry** section, click the **Copy** icon to copy the **Azure AI Foundry project endpoint**.
 
     ![Copy connection string](../media/project-connection-string.png){:width="500"}
 
