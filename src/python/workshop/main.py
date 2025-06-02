@@ -30,7 +30,6 @@ TENTS_DATA_SHEET_FILE = "datasheet/contoso-tents-datasheet.pdf"
 FONTS_ZIP = "fonts/fonts.zip"
 API_DEPLOYMENT_NAME = os.getenv("MODEL_DEPLOYMENT_NAME")
 PROJECT_ENDPOINT = os.environ["PROJECT_ENDPOINT"]
-BING_CONNECTION_NAME = os.getenv("BING_CONNECTION_NAME")
 AZURE_BING_CONNECTION_ID = os.environ["AZURE_BING_CONNECTION_ID"]
 MAX_COMPLETION_TOKENS = 10240
 MAX_PROMPT_TOKENS = 20480
@@ -57,8 +56,8 @@ functions = AsyncFunctionTool(
     }
 )
 
-INSTRUCTIONS_FILE = "instructions/function_calling.txt"
-INSTRUCTIONS_FILE = "instructions/file_search.txt"
+# INSTRUCTIONS_FILE = "instructions/function_calling.txt"
+# INSTRUCTIONS_FILE = "instructions/file_search.txt"
 # INSTRUCTIONS_FILE = "instructions/code_interpreter.txt"
 # INSTRUCTIONS_FILE = "instructions/bing_grounding.txt"
 # INSTRUCTIONS_FILE = "instructions/code_interpreter_multilingual.txt"
@@ -69,20 +68,20 @@ async def add_agent_tools() -> None:
     font_file_info = None
 
     # Add the functions tool
-    toolset.add(functions)
+    # toolset.add(functions)
 
     # Add the tents data sheet to a new vector data store
-    vector_store = await utilities.create_vector_store(
-        agents_client,
-        files=[TENTS_DATA_SHEET_FILE],
-        vector_store_name="Contoso Product Information Vector Store",
-    )
-    file_search_tool = FileSearchTool(vector_store_ids=[vector_store.id])
-    toolset.add(file_search_tool)
+    # vector_store = await utilities.create_vector_store(
+    #     agents_client,
+    #     files=[TENTS_DATA_SHEET_FILE],
+    #     vector_store_name="Contoso Product Information Vector Store",
+    # )
+    # file_search_tool = FileSearchTool(vector_store_ids=[vector_store.id])
+    # toolset.add(file_search_tool)
 
     # Add the code interpreter tool
-    code_interpreter = CodeInterpreterTool()
-    toolset.add(code_interpreter)
+    # code_interpreter = CodeInterpreterTool()
+    # toolset.add(code_interpreter)
 
     # Add the Bing grounding tool
     # bing_grounding = BingGroundingTool(connection_id=AZURE_BING_CONNECTION_ID)

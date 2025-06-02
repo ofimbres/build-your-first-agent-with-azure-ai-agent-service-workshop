@@ -35,7 +35,7 @@ Learn more about the Foundry Agent Service in the [Foundry Agent Service documen
 
 1. Gather the following information from the output of the deployment as you'll need this information to update the .env file:
 
-    - **PROJECT_CONNECTION_STRING**
+    - **PROJECT_ENDPOINT**
     - **BING_CONNECTION_NAME**
     - **APP_INSIGHTS_INSTRUMENTATION_KEY**
 
@@ -84,7 +84,7 @@ Learn more about the Foundry Agent Service in the [Foundry Agent Service documen
 1. **Update** the .env file with the following environment variables from the deployment output:
 
     ```text
-    PROJECT_CONNECTION_STRING=<PROJECT_CONNECTION_STRING>
+    PROJECT_ENDPOINT=<PROJECT_ENDPOINT>
     BING_CONNECTION_NAME=<BING_CONNECTION_NAME>
     APP_INSIGHTS_INSTRUMENTATION_KEY=<APP_INSIGHTS_INSTRUMENTATION_KEY>
     ```
