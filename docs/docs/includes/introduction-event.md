@@ -119,7 +119,7 @@ Next, we log in to Azure AI Foundry to retrieve the project connection string, w
     ![Select project](../media/ai-foundry-project.png){:width="500"}
 
 6. Review the introduction guide and click **Close**.
-7. Locate the **Project details** section, click the **Copy** icon to copy the **Project connection string**.
+7. Locate the **Endpoints and keys** -> **Libraries** -> **Azure AI Foundry** section, click the **Copy** icon to copy the **Azure AI Foundry project endpoint**.
 
     ![Copy connection string](../media/project-connection-string.png){:width="500"}
 
