@@ -13,7 +13,7 @@ public class Lab4(PersistentAgentsClient client, string modelName, IConfiguratio
     public override IEnumerable<ToolDefinition> IntialiseLabTools()
     {
         BingGroundingSearchConfiguration searchConfig = new(
-            config.GetConnectionString("BingGrounding") ?? throw new InvalidOperationException("The Bing Grounding connection string is not configured.")
+            config["Azure:BingConnectionId"] ?? throw new InvalidOperationException("The Bing Grounding connection is not configured. Ensure a correctly formatted connection ID is provided via the config setting 'Azure:BingConnectionId'.")
         );
         return [
             new FileSearchToolDefinition(),
