@@ -31,6 +31,12 @@ $outputs = $jsonData.properties.outputs
 # Extract values from the JSON object
 $projectsEndpoint = $outputs.projectsEndpoint.value
 $resourceGroupName = $outputs.resourceGroupName.value
+$subscriptionId = $outputs.subscriptionId.value
+$aiAccountName = $outputs.aiAccountName.value
+$aiProjectName = $outputs.aiProjectName.value
+$bingResourceName = "groundingwithbingsearch"
+
+$bingConnectionId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.CognitiveServices/accounts/$aiAccountName/projects/$aiProjectName/connections/$bingResourceName"
 
 if ([string]::IsNullOrEmpty($projectsEndpoint)) {
     Write-Host "Error: projectsEndpoint not found. Possible deployment failure."
@@ -48,7 +54,7 @@ if (Test-Path $ENV_FILE_PATH) {
 # Create a new file and write to it
 @"
 PROJECT_CONNECTION_STRING=$projectsEndpoint
-BING_CONNECTION_NAME="groundingwithbingsearch"
+BING_CONNECTION_NAME=$bingConnectionId
 MODEL_DEPLOYMENT_NAME="$MODEL_NAME"
 "@ | Set-Content -Path $ENV_FILE_PATH
 
@@ -58,6 +64,7 @@ $CSHARP_PROJECT_PATH = "../src/csharp/workshop/AgentWorkshop.Client/AgentWorksho
 # Set the user secrets for the C# project
 dotnet user-secrets set "ConnectionStrings:AiAgentService" "$projectsEndpoint" --project "$CSHARP_PROJECT_PATH"
 dotnet user-secrets set "Azure:ModelName" "$MODEL_NAME" --project "$CSHARP_PROJECT_PATH"
+dotnet user-secrets set "Azure:BingConnectionId" "$bingConnectionId" --project "$CSHARP_PROJECT_PATH"
 
 # Delete the output.json file
 Remove-Item -Path output.json -Force

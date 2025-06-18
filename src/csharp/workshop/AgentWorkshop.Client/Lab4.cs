@@ -10,7 +10,7 @@ public class Lab4(PersistentAgentsClient client, string modelName, IConfiguratio
 
     private PersistentAgentsVectorStore? vectorStore;
 
-    public override IEnumerable<ToolDefinition> IntialiseLabTools()
+    public override IEnumerable<ToolDefinition> InitialiseLabTools()
     {
         BingGroundingSearchConfiguration searchConfig = new(
             config["Azure:BingConnectionId"] ?? throw new InvalidOperationException("The Bing Grounding connection is not configured. Ensure a correctly formatted connection ID is provided via the config setting 'Azure:BingConnectionId'.")

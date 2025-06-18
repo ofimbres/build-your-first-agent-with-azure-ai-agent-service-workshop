@@ -29,6 +29,12 @@ fi
 
 PROJECTS_ENDPOINT=$(jq -r '.properties.outputs.projectsEndpoint.value' output.json)
 RESOURCE_GROUP_NAME=$(jq -r '.properties.outputs.resourceGroupName.value' output.json)
+SUBSCRIPTION_ID=$(jq -r '.properties.outputs.subscriptionId.value' output.json)
+AI_SERVICE_NAME=$(jq -r '.properties.outputs.aiAccountName.value' output.json)
+AI_PROJECT_NAME=$(jq -r '.properties.outputs.aiProjectName.value' output.json)
+BING_RESOURCE_NAME="groundingwithbingsearch"
+
+BING_CONNECTION_ID="/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.CognitiveServices/accounts/$AI_SERVICE_NAME/projects/$AI_PROJECT_NAME/connections/$BING_RESOURCE_NAME"
 
 if [ -z "$PROJECTS_ENDPOINT" ]; then
   echo "Error: projectsEndpoint not found. Possible deployment failure."
@@ -40,10 +46,11 @@ ENV_FILE_PATH="../src/python/workshop/.env"
 # Delete the file if it exists
 [ -f "$ENV_FILE_PATH" ] && rm "$ENV_FILE_PATH"
 
+
 # Write to the .env file
 {
   echo "PROJECT_CONNECTION_STRING=$PROJECTS_ENDPOINT"
-  echo "BING_CONNECTION_NAME=\"groundingwithbingsearch\""
+  echo "BING_CONNECTION_NAME=$BING_CONNECTION_ID"
   echo "MODEL_DEPLOYMENT_NAME=\"$MODEL_NAME\""
 } > "$ENV_FILE_PATH"
 
@@ -52,6 +59,7 @@ CSHARP_PROJECT_PATH="../src/csharp/workshop/AgentWorkshop.Client/AgentWorkshop.C
 # Set the user secrets for the C# project
 dotnet user-secrets set "ConnectionStrings:AiAgentService" "$PROJECTS_ENDPOINT" --project "$CSHARP_PROJECT_PATH"
 dotnet user-secrets set "Azure:ModelName" "$MODEL_NAME" --project "$CSHARP_PROJECT_PATH"
+dotnet user-secrets set "Azure:BingConnectionId" "$BING_CONNECTION_ID" --project "$CSHARP_PROJECT_PATH"
 
 # Delete the output.json file
 rm -f output.json

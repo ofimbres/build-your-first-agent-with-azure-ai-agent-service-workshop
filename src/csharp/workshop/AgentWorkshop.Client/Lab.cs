@@ -24,7 +24,7 @@ public abstract class Lab(PersistentAgentsClient client, string modelName) : IAs
 
     private bool disposeAgent = true;
 
-    public virtual IEnumerable<ToolDefinition> IntialiseLabTools() => [];
+    public virtual IEnumerable<ToolDefinition> InitialiseLabTools() => [];
 
     private IEnumerable<ToolDefinition> InitialiseTools() => [
         new FunctionToolDefinition(
@@ -42,7 +42,7 @@ public abstract class Lab(PersistentAgentsClient client, string modelName) : IAs
             },
             new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase })
         ),
-        ..IntialiseLabTools()
+        ..InitialiseLabTools()
     ];
 
     public async Task RunAsync()

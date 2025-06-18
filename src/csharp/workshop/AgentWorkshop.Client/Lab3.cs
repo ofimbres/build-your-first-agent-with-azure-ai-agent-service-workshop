@@ -6,6 +6,6 @@ public class Lab3(PersistentAgentsClient client, string modelName) : Lab(client,
 {
     protected override string InstructionsFileName => "code_interpreter.txt";
 
-    public override IEnumerable<ToolDefinition> IntialiseLabTools() =>
+    public override IEnumerable<ToolDefinition> InitialiseLabTools() =>
         [new CodeInterpreterToolDefinition()];
 }

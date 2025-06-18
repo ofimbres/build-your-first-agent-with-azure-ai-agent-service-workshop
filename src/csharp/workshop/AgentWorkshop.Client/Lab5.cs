@@ -17,7 +17,7 @@ public class Lab5(PersistentAgentsClient client, string modelName) : Lab(client,
         );
     }
 
-    public override IEnumerable<ToolDefinition> IntialiseLabTools() =>
+    public override IEnumerable<ToolDefinition> InitialiseLabTools() =>
         [new CodeInterpreterToolDefinition()];
 
     protected override ToolResources? InitialiseToolResources()

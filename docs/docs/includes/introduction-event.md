@@ -80,7 +80,7 @@ Follow these steps to open the workshop in Visual Studio Code:
 === "C#"
 
     1. From a terminal window, execute the following commands to clone the workshop repository:
-    
+
         ```powershell
         git clone https://github.com/microsoft/build-your-first-agent-with-azure-ai-agent-service-workshop.git
         ```
@@ -137,15 +137,15 @@ Next, we log in to Azure AI Foundry to retrieve the project endpoint, which the 
     3. Paste the **Project endpoint** you copied from Azure AI Foundry into the `.env` file.
 
         ```python
-        PROJECT_ENDPOINT="<your_project_endpoint>"
+        PROJECT_CONNECTION_STRING="<your_project_endpoint>"
         ```
 
         Your `.env` file should look similar to this but with your project endpoint.
 
         ```python
         MODEL_DEPLOYMENT_NAME="gpt-4o"
-        BING_CONNECTION_NAME="groundingwithbingsearch"
-        PROJECT_ENDPOINT="<your_project_endpoint>"
+        BING_CONNECTION_NAME="/subscriptions/<subscription_id>/resourceGroups/<resource_group>/providers/Microsoft.CognitiveServices/accounts/<ai_account>/projects/<project_name>/connections/groundingwithbingsearch"
+        PROJECT_CONNECTION_STRING="<your_project_endpoint>"
         ```
 
     4. Save the `.env` file.
@@ -177,11 +177,22 @@ Next, we log in to Azure AI Foundry to retrieve the project endpoint, which the 
         ```powershell
         dotnet user-secrets set "ConnectionStrings:AiAgentService" "<your_project_endpoint>"
         ```
-    
+
     3. Add the **Model deployment name** to the user secrets.
 
         ```powershell
         dotnet user-secrets set "Azure:ModelName" "gpt-4o"
+        ```
+
+    4. Add the **Bing connection ID** to the user secrets for grounding with Bing search.
+
+        ```powershell
+        $subId = $(az account show --query id --output tsv)
+        $rgName = "rg-agent-workshop"
+        $aiAccount = "<ai_account_name>" # Replace with the actual AI account name
+        $aiProject = "<ai_project_name>" # Replace with the actual AI project name
+        $bingConnectionId = "/subscriptions/$subId/resourceGroups/$rgName/providers/Microsoft.CognitiveServices/accounts/$aiAccount/projects/$aiProject/connections/groundingwithbingsearch"
+        dotnet user-secrets set "Azure:BingConnectionId" "$bingConnectionId"
         ```
 
     ## Project Structure

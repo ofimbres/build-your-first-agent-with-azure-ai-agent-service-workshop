@@ -201,6 +201,17 @@ We have provided a bash script to automate the deployment of the resources requi
             dotnet user-secrets set "Azure:ModelName" "gpt-4o" --project "$CSHARP_PROJECT_PATH"
             ```
 
+        5. Add the **Bing connection ID** to the user secrets for grounding with Bing search.
+
+            ```powershell
+            $subId = $(az account show --query id --output tsv)
+            $rgName = "rg-agent-workshop"
+            $aiAccount = "<ai_account_name>" # Replace with the actual AI account name
+            $aiProject = "<ai_project_name>" # Replace with the actual AI project name
+            $bingConnectionId = "/subscriptions/$subId/resourceGroups/$rgName/providers/Microsoft.CognitiveServices/accounts/$aiAccount/projects/$aiProject/connections/groundingwithbingsearch"
+            dotnet user-secrets set "Azure:BingConnectionId" "$bingConnectionId" --project "$CSHARP_PROJECT_PATH"
+            ```
+
 ## Selecting the Language Workspace
 
 There are two workspaces in the workshop, one for Python and one for C#. The workspace contains the source code and all the files needed to complete the labs for each language. Choose the workspace that matches the language you want to work with.
@@ -214,7 +225,7 @@ There are two workspaces in the workshop, one for Python and one for C#. The wor
         /workspaces/build-your-first-agent-with-azure-ai-agent-service-workshop/.vscode/
         ```
 
-	3. Choose the file named **python-workspace.code-workspace** to open the workspace.
+    3. Choose the file named **python-workspace.code-workspace** to open the workspace.
 
     ## Project Structure
 
@@ -243,7 +254,7 @@ There are two workspaces in the workshop, one for Python and one for C#. The wor
         /workspaces/build-your-first-agent-with-azure-ai-agent-service-workshop/.vscode/
         ```
 
-	3. Choose the file named **csharp-workspace.code-workspace** to open the workspace.
+    3. Choose the file named **csharp-workspace.code-workspace** to open the workspace.
 
     ## Project Structure
 

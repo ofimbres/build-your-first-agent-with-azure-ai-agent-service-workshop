@@ -8,7 +8,7 @@ public class Lab2(PersistentAgentsClient client, string modelName) : Lab(client,
 
     private PersistentAgentsVectorStore? vectorStore;
 
-    public override IEnumerable<ToolDefinition> IntialiseLabTools() =>
+    public override IEnumerable<ToolDefinition> InitialiseLabTools() =>
         [new FileSearchToolDefinition()];
 
     protected override async Task InitialiseLabAsync()
