@@ -2,8 +2,8 @@ import asyncio
 import logging
 import os
 
-from azure.ai.projects.aio import AIProjectClient
-from azure.ai.projects.models import (
+from azure.ai.agents.aio import AgentsClient
+from azure.ai.agents.models import (
     Agent,
     AgentThread,
     AsyncFunctionTool,
@@ -12,7 +12,7 @@ from azure.ai.projects.models import (
     CodeInterpreterTool,
     FileSearchTool,
 )
-from azure.identity import DefaultAzureCredential
+from azure.identity.aio import DefaultAzureCredential
 from dotenv import load_dotenv
 
 from sales_data import SalesData
@@ -29,8 +29,8 @@ AGENT_NAME = "Contoso Sales Agent"
 TENTS_DATA_SHEET_FILE = "datasheet/contoso-tents-datasheet.pdf"
 FONTS_ZIP = "fonts/fonts.zip"
 API_DEPLOYMENT_NAME = os.getenv("MODEL_DEPLOYMENT_NAME")
-PROJECT_CONNECTION_STRING = os.environ["PROJECT_CONNECTION_STRING"]
-BING_CONNECTION_NAME = os.getenv("BING_CONNECTION_NAME")
+PROJECT_ENDPOINT = os.environ["PROJECT_ENDPOINT"]
+AZURE_BING_CONNECTION_ID = os.environ["AZURE_BING_CONNECTION_ID"]
 MAX_COMPLETION_TOKENS = 10240
 MAX_PROMPT_TOKENS = 20480
 # The LLM is used to generate the SQL queries.
@@ -45,9 +45,9 @@ utilities = Utilities()
 sales_data = SalesData(utilities)
 
 
-project_client = AIProjectClient.from_connection_string(
+agents_client = AgentsClient(
     credential=DefaultAzureCredential(),
-    conn_str=PROJECT_CONNECTION_STRING,
+    endpoint=PROJECT_ENDPOINT,
 )
 
 functions = AsyncFunctionTool(
@@ -72,7 +72,7 @@ async def add_agent_tools() -> None:
 
     # Add the tents data sheet to a new vector data store
     # vector_store = await utilities.create_vector_store(
-    #     project_client,
+    #     agents_client,
     #     files=[TENTS_DATA_SHEET_FILE],
     #     vector_store_name="Contoso Product Information Vector Store",
     # )
@@ -84,12 +84,11 @@ async def add_agent_tools() -> None:
     # toolset.add(code_interpreter)
 
     # Add the Bing grounding tool
-    # bing_connection = await project_client.connections.get(connection_name=BING_CONNECTION_NAME)
-    # bing_grounding = BingGroundingTool(connection_id=bing_connection.id)
+    # bing_grounding = BingGroundingTool(connection_id=AZURE_BING_CONNECTION_ID)
     # toolset.add(bing_grounding)
 
     # Add multilingual support to the code interpreter
-    # font_file_info = await utilities.upload_file(project_client, utilities.shared_files_path / FONTS_ZIP)
+    # font_file_info = await utilities.upload_file(agents_client, utilities.shared_files_path / FONTS_ZIP)
     # code_interpreter.add_file(file_id=font_file_info.id)
 
     return font_file_info
@@ -118,7 +117,7 @@ async def initialize() -> tuple[Agent, AgentThread]:
                 "{font_file_id}", font_file_info.id)
 
         print("Creating agent...")
-        agent = await project_client.agents.create_agent(
+        agent = await agents_client.create_agent(
             model=API_DEPLOYMENT_NAME,
             name=AGENT_NAME,
             instructions=instructions,
@@ -128,11 +127,11 @@ async def initialize() -> tuple[Agent, AgentThread]:
         )
         print(f"Created agent, ID: {agent.id}")
 
-        project_client.agents.enable_auto_function_calls(toolset=toolset)
+        agents_client.enable_auto_function_calls(tools=toolset)
         print("Enabled auto function calls.")
 
         print("Creating thread...")
-        thread = await project_client.agents.create_thread()
+        thread = await agents_client.threads.create()
         print(f"Created thread, ID: {thread.id}")
 
         return agent, thread
@@ -144,37 +143,50 @@ async def initialize() -> tuple[Agent, AgentThread]:
 
 async def cleanup(agent: Agent, thread: AgentThread) -> None:
     """Cleanup the resources."""
-    existing_files = await project_client.agents.list_files()
+    existing_files = await agents_client.files.list()
     for f in existing_files.data:
-        await project_client.agents.delete_file(f.id)
-    await project_client.agents.delete_thread(thread.id)
-    await project_client.agents.delete_agent(agent.id)
+        await agents_client.files.delete(f.id)
+    await agents_client.threads.delete(thread.id)
+    await agents_client.delete_agent(agent.id)
     await sales_data.close()
 
 
 async def post_message(thread_id: str, content: str, agent: Agent, thread: AgentThread) -> None:
     """Post a message to the Foundry Agent Service."""
     try:
-        await project_client.agents.create_message(
+        await agents_client.messages.create(
             thread_id=thread_id,
             role="user",
             content=content,
         )
 
-        stream = await project_client.agents.create_stream(
+        async with await agents_client.runs.stream(
             thread_id=thread.id,
             agent_id=agent.id,
             event_handler=StreamEventHandler(
-                functions=functions, project_client=project_client, utilities=utilities),
+                functions=functions, project_client=agents_client, utilities=utilities),
             max_completion_tokens=MAX_COMPLETION_TOKENS,
             max_prompt_tokens=MAX_PROMPT_TOKENS,
             temperature=TEMPERATURE,
             top_p=TOP_P,
             instructions=agent.instructions,
-        )
+        ) as stream:
+            await stream.until_done()
 
-        async with stream as s:
-            await s.until_done()
+        # stream = await agents_client.runs.stream(
+        #     thread_id=thread.id,
+        #     agent_id=agent.id,
+        #     event_handler=StreamEventHandler(
+        #         functions=functions, project_client=agents_client, utilities=utilities),
+        #     max_completion_tokens=MAX_COMPLETION_TOKENS,
+        #     max_prompt_tokens=MAX_PROMPT_TOKENS,
+        #     temperature=TEMPERATURE,
+        #     top_p=TOP_P,
+        #     instructions=agent.instructions,
+        # )
+
+        # async with stream as s:
+        #     await s.until_done()
     except Exception as e:
         utilities.log_msg_purple(
             f"An error occurred posting the message: {e!s}")
@@ -184,7 +196,7 @@ async def main() -> None:
     """
     Example questions: Sales by region, top-selling products, total shipping costs by region, show as a pie chart.
     """
-    async with project_client:
+    async with agents_client:
         agent, thread = await initialize()
         if not agent or not thread:
             print(f"{tc.BG_BRIGHT_RED}Initialization failed. Ensure you have uncommented the instructions file for the lab.{tc.RESET}")

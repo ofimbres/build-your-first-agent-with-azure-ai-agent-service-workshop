@@ -1,7 +1,7 @@
 from typing import Any
 
 from azure.ai.projects.aio import AIProjectClient
-from azure.ai.projects.models import (
+from azure.ai.agents.models import (
     AsyncAgentEventHandler,
     AsyncFunctionTool,
     MessageDeltaChunk,

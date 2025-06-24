@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from azure.ai.projects.aio import AIProjectClient
-from azure.ai.projects.models import ThreadMessage
+from azure.ai.agents.aio import AgentsClient
+from azure.ai.agents.models import ThreadMessage
 
 from terminal_colors import TerminalColors as tc
 
@@ -31,7 +31,7 @@ class Utilities:
         """Print a token in blue."""
         print(f"{tc.BLUE}{msg}{tc.RESET}", end="", flush=True)
 
-    async def get_file(self, project_client: AIProjectClient, file_id: str, attachment_name: str) -> None:
+    async def get_file(self, agents_client: AgentsClient, file_id: str, attachment_name: str) -> None:
         """Retrieve the file and save it to the local disk."""
         self.log_msg_green(f"Getting file with ID: {file_id}")
 
@@ -48,12 +48,12 @@ class Utilities:
 
         # Save the file using a synchronous context manager
         with file_path.open("wb") as file:
-            async for chunk in await project_client.agents.get_file_content(file_id):
+            async for chunk in await agents_client.files.get_content(file_id):
                 file.write(chunk)
 
         self.log_msg_green(f"File saved to {file_path}")
 
-    async def get_files(self, message: ThreadMessage, project_client: AIProjectClient) -> None:
+    async def get_files(self, message: ThreadMessage, project_client: AgentsClient) -> None:
         """Get the image files from the message and kickoff download."""
         if message.image_contents:
             for index, image in enumerate(message.image_contents, start=0):
@@ -68,15 +68,15 @@ class Utilities:
                 )
                 await self.get_file(project_client, attachment.file_id, attachment_name)
 
-    async def upload_file(self, project_client: AIProjectClient, file_path: Path, purpose: str = "assistants") -> None:
+    async def upload_file(self, agents_client: AgentsClient, file_path: Path, purpose: str = "assistants") -> None:
         """Upload a file to the project."""
         self.log_msg_purple(f"Uploading file: {file_path}")
-        file_info = await project_client.agents.upload_file(file_path=file_path, purpose=purpose)
+        file_info = await agents_client.files.upload(file_path=file_path, purpose=purpose)
         self.log_msg_purple(f"File uploaded with ID: {file_info.id}")
         return file_info
 
     async def create_vector_store(
-        self, project_client: AIProjectClient, files: list[str], vector_store_name: str
+        self, agents_client: AgentsClient, files: list[str], vector_store_name: str
     ) -> None:
         """Upload a file to the project."""
 
@@ -86,13 +86,13 @@ class Utilities:
         # Upload the files
         for file in files:
             file_path = prefix / file
-            file_info = await self.upload_file(project_client, file_path=file_path, purpose="assistants")
+            file_info = await self.upload_file(agents_client, file_path=file_path, purpose="assistants")
             file_ids.append(file_info.id)
 
         self.log_msg_purple("Creating the vector store")
 
         # Create a vector store
-        vector_store = await project_client.agents.create_vector_store_and_poll(
+        vector_store = await agents_client.vector_stores.create_and_poll(
             file_ids=file_ids, name=vector_store_name
         )
 

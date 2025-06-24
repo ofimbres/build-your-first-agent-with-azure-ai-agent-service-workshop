@@ -53,8 +53,8 @@ if (Test-Path $ENV_FILE_PATH) {
 
 # Create a new file and write to it
 @"
-PROJECT_CONNECTION_STRING=$projectsEndpoint
-BING_CONNECTION_NAME=$bingConnectionId
+PROJECT_ENDPOINT=$projectsEndpoint
+AZURE_BING_CONNECTION_ID=$bingConnectionId
 MODEL_DEPLOYMENT_NAME="$MODEL_NAME"
 "@ | Set-Content -Path $ENV_FILE_PATH
 
