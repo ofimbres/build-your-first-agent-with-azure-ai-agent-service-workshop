@@ -105,20 +105,20 @@ We have provided a bash script to automate the deployment of the resources requi
 
     === "Python"
 
-        The deploy script generates the **.env** file, which contains the project endpoint, model deployment name, and Bing connection name.
-
-        Your **.env** file should look similar to this but with your project endpoint.
+        The deploy script generates the **.env** file, which contains the project endpoint, model deployment name, and Bing connection name. 
+        
+        You'll see this file when you open the Python workspace in VS Code. Your **.env** file will look similar to this but with your project endpoint.
 
         ```python
         MODEL_DEPLOYMENT_NAME="gpt-4o"
-        BING_CONNECTION_NAME="groundingwithbingsearch"
+        AZURE_BING_CONNECTION_ID=""
         PROJECT_ENDPOINT="<your_project_endpoint>"
         ```
     === "C#"
 
         The automated deployment script stores project variables securely by using the Secret Manager feature for [safe storage of app secrets in development in ASP.NET Core](https://learn.microsoft.com/aspnet/core/security/app-secrets){:target="_blank"}.
 
-        You can view the secrets by running the following command:
+        You can view the secrets by running the following command after you have opened the C# workspace in VS Code:
 
         ```bash
         dotnet user-secrets list

@@ -112,7 +112,7 @@ In this lab, you will enable the function logic to execute dynamic SQL queries a
             # code_interpreter.add_file(file_id=font_file_info.id)
 
             # Add the Bing grounding tool
-            # bing_connection = await project_client.connections.get(connection_name=BING_CONNECTION_NAME)
+            # bing_connection = await project_client.connections.get(connection_name=AZURE_BING_CONNECTION_ID)
             # bing_grounding = BingGroundingTool(connection_id=bing_connection.id)
             # toolset.add(bing_grounding)
 

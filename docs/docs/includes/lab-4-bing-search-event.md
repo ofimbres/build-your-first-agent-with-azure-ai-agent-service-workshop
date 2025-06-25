@@ -61,7 +61,7 @@ For more information, visit the [Grounding with Bing Search](https://learn.micro
         ```python
         # INSTRUCTIONS_FILE = "instructions/bing_grounding.txt"
 
-        # bing_connection = project_client.connections.get(connection_name=BING_CONNECTION_NAME)
+        # bing_connection = project_client.connections.get(connection_name=AZURE_BING_CONNECTION_ID)
         # bing_grounding = BingGroundingTool(bing_connection)
         # toolset.add(bing_grounding)
         ```
@@ -106,7 +106,7 @@ For more information, visit the [Grounding with Bing Search](https://learn.micro
             # code_interpreter.add_file(file_id=font_file_info.id)
 
             # Add the Bing grounding tool
-            bing_connection = await project_client.connections.get(connection_name=BING_CONNECTION_NAME)
+            bing_connection = await project_client.connections.get(connection_name=AZURE_BING_CONNECTION_ID)
             bing_grounding = BingGroundingTool(connection_id=bing_connection.id)
             toolset.add(bing_grounding)
 

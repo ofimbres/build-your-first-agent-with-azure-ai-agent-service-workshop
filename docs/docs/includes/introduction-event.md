@@ -144,7 +144,7 @@ Next, we log in to Azure AI Foundry to retrieve the project endpoint, which the 
 
         ```python
         MODEL_DEPLOYMENT_NAME="gpt-4o"
-        BING_CONNECTION_NAME="/subscriptions/<subscription_id>/resourceGroups/<resource_group>/providers/Microsoft.CognitiveServices/accounts/<ai_account>/projects/<project_name>/connections/groundingwithbingsearch"
+        AZURE_BING_CONNECTION_ID="/subscriptions/<subscription_id>/resourceGroups/<resource_group>/providers/Microsoft.CognitiveServices/accounts/<ai_account>/projects/<project_name>/connections/groundingwithbingsearch"
         PROJECT_CONNECTION_STRING="<your_project_endpoint>"
         ```
 
