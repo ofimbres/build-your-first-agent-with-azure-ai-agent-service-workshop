@@ -22,7 +22,7 @@ Unlike traditional applications, where developers define the logic and workflows
 
 ## What is the Foundry Agent Service?
 
-The Foundry Agent Service offers a fully managed cloud service with SDKs for [Python](https://learn.microsoft.com/azure/ai-services/agents/quickstart?pivots=programming-language-python-azure){:target="_blank"}, [C#](https://learn.microsoft.com/azure/ai-services/agents/quickstart?pivots=programming-language-csharp){:target="_blank"}, and [TypeScript](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/quickstart?pivots=programming-language-typescript). It simplifies AI agent development, reducing complex tasks like function calling to just a few lines of code.
+The Foundry Agent Service offers a fully managed cloud service with SDKs for [Python](https://learn.microsoft.com/azure/ai-services/agents/quickstart?pivots=programming-language-python-azure){:target="_blank"}, [C#](https://learn.microsoft.com/azure/ai-services/agents/quickstart?pivots=programming-language-csharp){:target="_blank"}, and [TypeScript](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/quickstart?pivots=programming-language-typescript){:target="_blank"}. It simplifies AI agent development, reducing complex tasks like function calling to just a few lines of code.
 
 !!! info
     Function calling allows you to connect LLMs to external tools and systems. This is useful for many things such as empowering AI agents with capabilities, or building deep integrations between your applications and LLMs.
