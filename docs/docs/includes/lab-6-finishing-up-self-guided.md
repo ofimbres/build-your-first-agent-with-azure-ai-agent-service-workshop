@@ -37,10 +37,10 @@ Your GitHub CodeSpace will shut down by itself, but it will consume a small amou
 
 Most of the resources you created in this lab are pay-as-you-go resources, meaning you won't be charged any more for using them. However, some storage services used by AI Foundry may incur small ongoing charges. To delete all resources, follow these steps:
 
-* Vist the [Azure Portal](https://portal.azure.com){:target="_blank"}
+* Visit the [Azure Portal](https://portal.azure.com){:target="_blank"}
 * Click **Resource groups**
-* Click on your resource group `rg-contoso-agent-workshop`
+* Click on your resource group `rg-agent-workshop-****`
 * Click **Delete Resource group**
-* In the field at the bottom "Enter resource group name to confirm deletion" enter `rg-contoso-agent-workshop`
+* In the field at the bottom "Enter resource group name to confirm deletion" enter `rg-agent-workshop-****`
 * Click **Delete**
   * At the Delete Confirmation prompt, click "Delete"
