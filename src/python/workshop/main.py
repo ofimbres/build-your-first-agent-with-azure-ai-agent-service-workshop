@@ -173,20 +173,6 @@ async def post_message(thread_id: str, content: str, agent: Agent, thread: Agent
         ) as stream:
             await stream.until_done()
 
-        # stream = await agents_client.runs.stream(
-        #     thread_id=thread.id,
-        #     agent_id=agent.id,
-        #     event_handler=StreamEventHandler(
-        #         functions=functions, project_client=agents_client, utilities=utilities),
-        #     max_completion_tokens=MAX_COMPLETION_TOKENS,
-        #     max_prompt_tokens=MAX_PROMPT_TOKENS,
-        #     temperature=TEMPERATURE,
-        #     top_p=TOP_P,
-        #     instructions=agent.instructions,
-        # )
-
-        # async with stream as s:
-        #     await s.until_done()
     except Exception as e:
         utilities.log_msg_purple(
             f"An error occurred posting the message: {e!s}")
