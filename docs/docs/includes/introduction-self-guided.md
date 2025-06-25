@@ -84,7 +84,7 @@ The following resources will be created in the **rg-agent-workshop-****** resour
 
 - An **Azure AI Foundry hub** named **foundry-******
 - An **Azure AI Foundry project** named **project-******
-- A **Serverless (pay-as-you-go) GPT-4o model deployment** named **gpt-4o (Global 2024-11-20)**. See pricing details [here](https://azure.microsoft.com/pricing/details/cognitive-services/openai-service/){:target="_blank"}.
+- A **Serverless (pay-as-you-go) GPT-4o model deployment** named **gpt-4o**. See pricing details [here](https://azure.microsoft.com/pricing/details/cognitive-services/openai-service/){:target="_blank"}.
 - A **Grounding with Bing Search** resource. See the [documentation](https://learn.microsoft.com/azure/ai-services/agents/how-to/tools/bing-grounding) and [pricing](https://www.microsoft.com/en-us/bing/apis/grounding-pricing){:target="_blank"} for details.
 
 !!! warning "You will need 140K TPM quota availability for the gpt-4o Global Standard SKU, not because the agent uses lots of tokens, but due to the frequency of calls made by the agent to the model. Review your quota availability in the [AI Foundry Management Center](https://ai.azure.com/managementCenter/quota){:target="_blank"}."
