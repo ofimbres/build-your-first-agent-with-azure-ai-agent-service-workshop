@@ -13,7 +13,7 @@ This workshop is designed to teach you about the Azure AI Agents Service and the
 
 ## Select Workshop Programming Language
 
-The workshop is available in both Python and C#. Use the language selector tabs to choose your preferred language wherever applicable. Note, don't switch languages mid-lab.
+The workshop is available in both Python and C#. Use the language selector tabs to choose your preferred language. Note, don't switch languages mid-workshop.
 
 **Select the tab for your preferred language:**
 
@@ -99,7 +99,7 @@ We have provided a bash script to automate the deployment of the resources requi
     cd infra && ./deploy.sh
     ```
 
-    !!! note "On Windows, run `deploy.ps1` instead of `deploy.sh`"
+    <!-- !!! note "On Windows, run `deploy.ps1` instead of `deploy.sh`" -->
 
     ### Workshop Configuration
 
