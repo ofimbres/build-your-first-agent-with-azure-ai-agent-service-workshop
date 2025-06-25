@@ -82,8 +82,8 @@ You need to authenticate with Azure so the agent app can access the Azure AI Age
 
 The following resources will be created in the `rg-agent-workshop-****` resource group in your Azure subscription.
 
-- An **Azure AI Foundry hub** named **agent-wksp**
-- An **Azure AI Foundry project** named **Agent Service Workshop**
+- An **Azure AI Foundry hub** named `foundry-****`
+- An **Azure AI Foundry project** named `project-****`
 - A **Serverless (pay-as-you-go) GPT-4o model deployment** named **gpt-4o (Global 2024-11-20)**. See pricing details [here](https://azure.microsoft.com/pricing/details/cognitive-services/openai-service/){:target="_blank"}.
 - A **Grounding with Bing Search** resource. See the [documentation](https://learn.microsoft.com/azure/ai-services/agents/how-to/tools/bing-grounding) and [pricing](https://www.microsoft.com/en-us/bing/apis/grounding-pricing){:target="_blank"} for details.
 
