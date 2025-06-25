@@ -96,7 +96,7 @@ In this lab, you will enable the function logic to execute dynamic SQL queries a
 
             # Add the tents data sheet to a new vector data store
             # vector_store = await utilities.create_vector_store(
-            #     project_client,
+            #     agents_client,
             #     files=[TENTS_DATA_SHEET_FILE],
             #     vector_store_name="Contoso Product Information Vector Store",
             # )
@@ -107,14 +107,13 @@ In this lab, you will enable the function logic to execute dynamic SQL queries a
             # code_interpreter = CodeInterpreterTool()
             # toolset.add(code_interpreter)
 
-            # Add multilingual support to the code interpreter
-            # font_file_info = await utilities.upload_file(project_client, utilities.shared_files_path / FONTS_ZIP)
-            # code_interpreter.add_file(file_id=font_file_info.id)
-
             # Add the Bing grounding tool
-            # bing_connection = await project_client.connections.get(connection_name=AZURE_BING_CONNECTION_ID)
-            # bing_grounding = BingGroundingTool(connection_id=bing_connection.id)
+            # bing_grounding = BingGroundingTool(connection_id=AZURE_BING_CONNECTION_ID)
             # toolset.add(bing_grounding)
+
+            # Add multilingual support to the code interpreter
+            # font_file_info = await utilities.upload_file(agents_client, utilities.shared_files_path / FONTS_ZIP)
+            # code_interpreter.add_file(file_id=font_file_info.id)
 
             return font_file_info
         ```
