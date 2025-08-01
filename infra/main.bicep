@@ -92,9 +92,23 @@ module foundryModelDeployment 'foundry-model-deployment.bicep' = {
   }
 }
 
+module functionApp 'function-app.bicep' = {
+  name: 'function-app-deployment'
+  scope: rg
+  params: {
+    functionAppName: toLower('func-${uniqueSuffix}')
+    appServicePlanName: toLower('plan-${uniqueSuffix}')
+    storageAccountName: toLower('st${replace(uniqueSuffix, '-', '')}')
+    location: location
+    tags: rootTags
+  }
+}
+
 // Outputs
 output subscriptionId string = subscription().subscriptionId
 output resourceGroupName string = rg.name
 output aiAccountName string = foundry.outputs.accountName
 output aiProjectName string = foundryProject.outputs.aiProjectName
 output projectsEndpoint string = '${foundry.outputs.endpoint}api/projects/${foundryProject.outputs.aiProjectName}'
+output functionAppUrl string = functionApp.outputs.functionAppUrl
+output functionAppName string = functionApp.outputs.functionAppName
