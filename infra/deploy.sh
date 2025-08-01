@@ -32,6 +32,7 @@ RESOURCE_GROUP_NAME=$(jq -r '.properties.outputs.resourceGroupName.value' output
 SUBSCRIPTION_ID=$(jq -r '.properties.outputs.subscriptionId.value' output.json)
 AI_SERVICE_NAME=$(jq -r '.properties.outputs.aiAccountName.value' output.json)
 AI_PROJECT_NAME=$(jq -r '.properties.outputs.aiProjectName.value' output.json)
+FUNCTION_APP_URL=$(jq -r '.properties.outputs.functionAppUrl.value' output.json)
 BING_RESOURCE_NAME="groundingwithbingsearch"
 
 BING_CONNECTION_ID="/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.CognitiveServices/accounts/$AI_SERVICE_NAME/projects/$AI_PROJECT_NAME/connections/$BING_RESOURCE_NAME"
@@ -52,6 +53,7 @@ ENV_FILE_PATH="../src/python/workshop/.env"
   echo "PROJECT_ENDPOINT=$PROJECTS_ENDPOINT"
   echo "AZURE_BING_CONNECTION_ID=$BING_CONNECTION_ID"
   echo "MODEL_DEPLOYMENT_NAME=\"$MODEL_NAME\""
+  echo "FUNCTION_APP_ENDPOINT=$FUNCTION_APP_URL/api"
 } > "$ENV_FILE_PATH"
 
 CSHARP_PROJECT_PATH="../src/csharp/workshop/AgentWorkshop.Client/AgentWorkshop.Client.csproj"

@@ -34,6 +34,7 @@ $resourceGroupName = $outputs.resourceGroupName.value
 $subscriptionId = $outputs.subscriptionId.value
 $aiAccountName = $outputs.aiAccountName.value
 $aiProjectName = $outputs.aiProjectName.value
+$functionAppUrl = $outputs.functionAppUrl.value
 $bingResourceName = "groundingwithbingsearch"
 
 $bingConnectionId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.CognitiveServices/accounts/$aiAccountName/projects/$aiProjectName/connections/$bingResourceName"
@@ -56,6 +57,7 @@ if (Test-Path $ENV_FILE_PATH) {
 PROJECT_ENDPOINT=$projectsEndpoint
 AZURE_BING_CONNECTION_ID=$bingConnectionId
 MODEL_DEPLOYMENT_NAME="$MODEL_NAME"
+FUNCTION_APP_ENDPOINT=$functionAppUrl/api
 "@ | Set-Content -Path $ENV_FILE_PATH
 
 # Set the C# project path
