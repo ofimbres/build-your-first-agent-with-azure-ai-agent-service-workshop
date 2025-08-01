@@ -68,9 +68,6 @@ dotnet user-secrets set "ConnectionStrings:AiAgentService" "$projectsEndpoint" -
 dotnet user-secrets set "Azure:ModelName" "$MODEL_NAME" --project "$CSHARP_PROJECT_PATH"
 dotnet user-secrets set "Azure:BingConnectionId" "$bingConnectionId" --project "$CSHARP_PROJECT_PATH"
 
-# Delete the output.json file
-Remove-Item -Path output.json -Force
-
 # Register the Bing Search resource provider
 Write-Host "Attempting to register the Bing Search provider"
 
@@ -110,3 +107,74 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Host "User role assignment succeeded."
+
+# Deploy Function App Code
+Write-Host "Deploying Function App code..."
+
+# Get Function App name from outputs
+$functionAppName = $outputs.functionAppName.value
+
+if (-not [string]::IsNullOrEmpty($functionAppName) -and $functionAppName -ne "null") {
+    Write-Host "Deploying code to Function App: $functionAppName"
+    
+    # Prepare deployment package
+    $tempDir = New-TemporaryFile | ForEach-Object { Remove-Item $_; New-Item -ItemType Directory -Path $_ }
+    $deployDir = Join-Path $tempDir "function"
+    
+    New-Item -ItemType Directory -Path $deployDir -Force | Out-Null
+    
+    # Copy all function files
+    $functionSourceDir = "../src/shared/azure-function"
+    Copy-Item -Path "$functionSourceDir\*" -Destination $deployDir -Recurse -Force
+    
+    # Copy database
+    $databasePath = "../src/shared/database/contoso-sales.db"
+    if (Test-Path $databasePath) {
+        Write-Host "Including database..."
+        Copy-Item -Path $databasePath -Destination $deployDir -Force
+    }
+    
+    # Install dependencies using Azure Functions structure
+    Write-Host "Installing dependencies..."
+    Set-Location $deployDir
+    $packagesDir = Join-Path $deployDir ".python_packages\lib\site-packages"
+    New-Item -ItemType Directory -Path $packagesDir -Force | Out-Null
+    pip install --target="$packagesDir" -r requirements.txt
+    
+    # Create deployment package
+    Write-Host "Creating deployment package..."
+    $zipPath = Join-Path $tempDir "function.zip"
+    Compress-Archive -Path "$deployDir\*" -DestinationPath $zipPath -Force
+    
+    # Deploy
+    Write-Host "Deploying function code..."
+    az functionapp deployment source config-zip `
+        --resource-group "$resourceGroupName" `
+        --name "$functionAppName" `
+        --src "$zipPath" `
+        --output none
+    
+    Write-Host "Waiting for deployment..."
+    Start-Sleep -Seconds 20
+    
+    # Cleanup
+    Remove-Item -Path $tempDir -Recurse -Force
+    
+    Write-Host "Function App deployment complete!"
+    Write-Host "Test endpoints:"
+    Write-Host "   Health: $functionAppUrl/health"
+    Write-Host "   Info: $functionAppUrl/database-info"
+} else {
+    Write-Host "Function App name not found in outputs, skipping code deployment"
+}
+
+# Delete the output.json file
+Remove-Item -Path output.json -Force
+
+Write-Host ""
+Write-Host "Deployment Complete!"
+Write-Host "===================="
+Write-Host "Azure AI Foundry resources deployed"
+Write-Host "Function App deployed and configured"
+Write-Host "Environment files created"
+Write-Host ""

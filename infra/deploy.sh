@@ -63,9 +63,6 @@ dotnet user-secrets set "ConnectionStrings:AiAgentService" "$PROJECTS_ENDPOINT" 
 dotnet user-secrets set "Azure:ModelName" "$MODEL_NAME" --project "$CSHARP_PROJECT_PATH"
 dotnet user-secrets set "Azure:BingConnectionId" "$BING_CONNECTION_ID" --project "$CSHARP_PROJECT_PATH"
 
-# Delete the output.json file
-rm -f output.json
-
 # Register the Bing Search resource provider
 echo "Attempting to register the Bing Search provider"
 
@@ -108,3 +105,71 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "User role assignment succeeded."
+
+# Deploy Function App Code
+echo "Deploying Function App code..."
+
+# Get Function App name from outputs
+FUNCTION_APP_NAME=$(jq -r '.properties.outputs.functionAppName.value' output.json 2>/dev/null)
+
+if [ -n "$FUNCTION_APP_NAME" ] && [ "$FUNCTION_APP_NAME" != "null" ]; then
+    echo "Deploying code to Function App: $FUNCTION_APP_NAME"
+    
+    # Prepare deployment package
+    TEMP_DIR=$(mktemp -d)
+    DEPLOY_DIR="$TEMP_DIR/function"
+    
+    mkdir -p "$DEPLOY_DIR"
+    
+    # Copy all function files
+    FUNCTION_SOURCE_DIR="../src/shared/azure-function"
+    cp -r "$FUNCTION_SOURCE_DIR"/* "$DEPLOY_DIR/"
+    
+    # Copy database
+    DATABASE_PATH="../src/shared/database/contoso-sales.db"
+    if [ -f "$DATABASE_PATH" ]; then
+        echo "Including database..."
+        cp "$DATABASE_PATH" "$DEPLOY_DIR/"
+    fi
+    
+    # Install dependencies using Azure Functions structure
+    echo "Installing dependencies..."
+    cd "$DEPLOY_DIR"
+    pip install --target="./.python_packages/lib/site-packages" -r requirements.txt
+    
+    # Create deployment package
+    echo "Creating deployment package..."
+    zip -r ../function.zip . -q
+    
+    # Deploy
+    echo "Deploying function code..."
+    az functionapp deployment source config-zip \
+        --resource-group "$RESOURCE_GROUP_NAME" \
+        --name "$FUNCTION_APP_NAME" \
+        --src "../function.zip" \
+        --output none
+    
+    echo "Waiting for deployment..."
+    sleep 20
+    
+    # Cleanup
+    rm -rf "$TEMP_DIR"
+    
+    echo "Function App deployment complete!"
+    echo "Test endpoints:"
+    echo "   Health: $FUNCTION_APP_URL/health"
+    echo "   Info: $FUNCTION_APP_URL/database-info"
+else
+    echo "Function App name not found in outputs, skipping code deployment"
+fi
+
+# Delete the output.json file
+rm -f output.json
+
+echo ""
+echo "Deployment Complete!"
+echo "====================="
+echo "Azure AI Foundry resources deployed"
+echo "Function App deployed and configured"
+echo "Environment files created"
+echo ""
