@@ -1,4 +1,5 @@
 import asyncio
+import json
 import logging
 import os
 from typing import Dict, List, Optional
@@ -16,6 +17,8 @@ from azure.ai.agents.models import (
     ConnectedAgentTool,
     FileSearchTool,
     MessageRole,
+    OpenApiTool,
+    OpenApiAnonymousAuthDetails
 )
 from azure.identity.aio import DefaultAzureCredential
 from dotenv import load_dotenv
@@ -57,6 +60,23 @@ class MultiAgentOrchestrator:
         self.specialist_agents: Dict[AgentRole, Agent] = {}
         self.coordinator_agent: Agent = None
         self.thread: AgentThread = None
+    
+    def _load_sales_api_spec(self) -> dict:
+        """Load the OpenAPI specification from the JSON file and replace endpoint placeholder."""
+        spec_file_path = os.path.join(os.path.dirname(__file__), "..", "..", "shared", "azure-function", "sales_api_spec.json")
+        try:
+            with open(spec_file_path, 'r') as f:
+                spec_content = f.read()
+            
+            # Replace the placeholder with the actual endpoint from environment
+            function_endpoint = os.getenv("FUNCTION_APP_ENDPOINT")
+            spec_content = spec_content.replace("{function_app_endpoint}", function_endpoint)
+            
+            return json.loads(spec_content)
+        except FileNotFoundError:
+            raise FileNotFoundError(f"OpenAPI spec file not found at {spec_file_path}")
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Invalid JSON in OpenAPI spec file: {e}")
         
     async def initialize_agents(self):
         """Initialize specialized agents and a coordinator that can call them."""
@@ -74,17 +94,25 @@ class MultiAgentOrchestrator:
     async def _create_specialist_agents(self):
         """Create specialized agents that work as tools for the coordinator."""
         
-        # Sales Analyst Agent
-        await self.sales_data.connect()
+        # Sales Analyst Agent - Use OpenAPI tool instead of local function
         sales_toolset = AsyncToolSet()
-        sales_functions = AsyncFunctionTool({
-            self.sales_data.async_fetch_sales_data_using_sqlite_query,
-        })
-        sales_toolset.add(sales_functions)
-        sales_toolset.add(CodeInterpreterTool())
+        
+        # Create OpenAPI tool that points to our FastAPI service
+        # Load the OpenAPI spec from external file
+        api_spec = self._load_sales_api_spec()
+        print(f"📋 Loaded OpenAPI spec with {len(api_spec.get('paths', {}))} endpoints")
+        auth = OpenApiAnonymousAuthDetails()
+        sales_api_tool = OpenApiTool(
+            name="sales_data_api", 
+            spec=api_spec,
+            description="API for querying Contoso sales data using SQLite queries and getting database schema information",
+            auth=auth
+        )
+        
+        sales_toolset.add(sales_api_tool)
         
         sales_instructions = self.utilities.load_instructions("instructions/multi_agent_sales_analyst.txt")
-        
+
         self.specialist_agents[AgentRole.SALES_ANALYST] = await self.agents_client.create_agent(
             model=self.model_name,
             name="Contoso Sales Analyst",
@@ -121,7 +149,6 @@ class MultiAgentOrchestrator:
         # Report Generator Agent
         report_toolset = AsyncToolSet()
         report_toolset.add(CodeInterpreterTool())
-        report_toolset.add(file_search_tool)  # Reuse the same vector store
         
         report_instructions = self.utilities.load_instructions("instructions/multi_agent_report_generator.txt")
         
@@ -193,25 +220,16 @@ class MultiAgentOrchestrator:
         )
         
         print("🤝 Coordinator is orchestrating specialist agents...")
-        print("⏳ This may take 1-3 minutes as agents collaborate...")
-        
-        import time
-        start_time = time.time()
         
         try:
             # Add timeout to prevent indefinite hanging
             run = await asyncio.wait_for(
                 self.agents_client.runs.create_and_process(
                     thread_id=self.thread.id,
-                    agent_id=self.coordinator_agent.id,
-                    max_completion_tokens=8192,
-                    temperature=0.1,
+                    agent_id=self.coordinator_agent.id
                 ),
                 timeout=300.0  # 5 minute timeout
             )
-            
-            elapsed_time = time.time() - start_time
-            print(f"⏱️ Processing completed in {elapsed_time:.1f} seconds")
             
         except asyncio.TimeoutError:
             print("❌ Task timed out after 5 minutes")
@@ -227,61 +245,47 @@ class MultiAgentOrchestrator:
         if run.status == "completed":
             print("✅ Task completed successfully")
             
-            # Get the final response from the coordinator
-            messages = await self.agents_client.threads.messages.list(
-                thread_id=self.thread.id,
-                limit=1,
-                order="desc"
-            )
-            
-            response_content = ""
-            if messages.data:
-                latest_message = messages.data[0]
-                if latest_message.role == MessageRole.AGENT and latest_message.content:
-                    for content in latest_message.content:
-                        if hasattr(content, 'text'):
-                            response_content += content.text.value
+            # Get all messages from the thread to see the conversation
+            try:
+                messages_paged = self.agents_client.messages.list(
+                    thread_id=self.thread.id
+                )
+                
+                # Convert AsyncItemPaged to list
+                messages_list = []
+                async for message in messages_paged:
+                    messages_list.append(message)
+                
+                print(f"📝 Found {len(messages_list)} messages in thread")
+                
+                # Print all messages for debugging
+                for i, message in enumerate(messages_list):
+                    print(f"Message {i+1}: Role={message.role}")
+                    if message.content:
+                        for content in message.content:
+                            if hasattr(content, 'text'):
+                                # preview = content.text.value[:200] + "..." if len(content.text.value) > 200 else content.text.value
+                                preview = content.text.value
+                                print(f"  Content preview: {preview}")
+                
+                # Get the final response from the coordinator (latest agent message)
+                response_content = ""
+                for message in messages_list:
+                    if message.role == MessageRole.AGENT and message.content:
+                        for content in message.content:
+                            if hasattr(content, 'text'):
+                                response_content = content.text.value
+                                break
+                        break  # Take the first (most recent) agent message
+                        
+            except Exception as e:
+                print(f"❌ Error retrieving messages: {e}")
+                response_content = "Error retrieving final response"
         
         elif run.status == "failed":
             error_msg = getattr(run, 'last_error', 'Unknown error')
             print(f"❌ Task failed: {error_msg}")
             response_content = f"Task failed: {error_msg}"
-            
-            # Try to get run steps for debugging
-            try:
-                run_steps = await self.agents_client.runs.steps.list(
-                    thread_id=self.thread.id,
-                    run_id=run.id
-                )
-                
-                print(f"\n🔍 Debugging failed run steps:")
-                for i, step in enumerate(run_steps.data):
-                    print(f"  Step {i+1}: {step.type} - Status: {step.status}")
-                    if step.status == "failed" and hasattr(step, 'last_error'):
-                        print(f"    Error: {step.last_error}")
-                        
-            except Exception as debug_error:
-                print(f"Could not retrieve run steps: {debug_error}")
-        
-        elif run.status == "requires_action":
-            print(f"⚠️ Task requires manual action - this usually means tool calls are stuck or need approval")
-            response_content = "Task requires manual action - tool calls may be stuck or need approval"
-            
-            # Try to get run steps to see what actions are required
-            try:
-                run_steps = await self.agents_client.runs.steps.list(
-                    thread_id=self.thread.id,
-                    run_id=run.id
-                )
-                
-                print(f"\n🔍 Required actions debug:")
-                for i, step in enumerate(run_steps.data):
-                    print(f"  Step {i+1}: {step.type} - Status: {step.status}")
-                    if step.type == "tool_calls" and step.status == "in_progress":
-                        print(f"    ⚠️ Tool calls are stuck - likely database timeout or connection issue")
-                        
-            except Exception as debug_error:
-                print(f"Could not retrieve run steps: {debug_error}")
         
         elif run.status in ["cancelled", "expired"]:
             print(f"⚠️ Task was {run.status}")
