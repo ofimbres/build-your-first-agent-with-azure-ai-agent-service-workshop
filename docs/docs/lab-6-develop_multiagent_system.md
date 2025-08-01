@@ -931,24 +931,24 @@ You are the intelligent coordinator for Contoso's multi-agent system. You have a
 
 Try these complex queries that benefit from multi-agent collaboration:
 
-1. **Comprehensive Market Analysis**:
+1. **Simple Sales Analysis**:
    ```
-   "Create a comprehensive analysis comparing our tent sales performance with competitor offerings and market trends. Include visualizations and strategic recommendations."
-   ```
-
-2. **Regional Expansion Strategy**:
-   ```
-   "Analyze our sales data to identify the best regions for expansion, research competitor presence in those markets, and create a strategic report with recommendations."
+   "Show me our total sales by product category for 2023"
    ```
 
-3. **Product Performance Deep Dive**:
+2. **Multi-Agent Competitive Analysis**:
    ```
-   "Compare our backpack sales across all regions, research competitor pricing and features, and generate a report on how we can improve our market position."
+   "Compare our 2023 winter sports sales performance to competitors like REI and Patagonia"
    ```
 
-4. **Competitive Intelligence Report**:
+3. **Comprehensive Strategic Report**:
    ```
-   "Analyze our climbing gear sales trends, research what competitors are doing in this space, and create a comprehensive competitive intelligence report."
+   "Create an executive summary of our climbing gear performance and market opportunities"
+   ```
+
+4. **Regional Expansion Analysis**:
+   ```
+   "Analyze our water gear sales data to identify the best regions for expansion, research competitor presence in those markets, and create a strategic report with recommendations."
    ```
 
 ## Advanced Multi-Agent Patterns
